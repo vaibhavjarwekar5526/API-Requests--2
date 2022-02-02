@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO - API</title>
+    <style>
+        h1{
+            text-align: center;
+            font-size: 40px;
+            margin: 20px 0px;
+        }
+        #form{
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid black;
+            border-radius: 20px;
+            width: 40%;
+            margin: auto;
+            padding: 20px 0px;
+            margin-bottom: 30px;
+        }
+        #container > div{
+            border: 1px solid black;
+            text-align: center;
+        }
+        #container{
+            display: grid;
+            grid-template-columns: repeat(3, 25%);
+            justify-content: center;
+            gap: 5%;
+        }
+    </style>
+</head>
+<body>
+    <section>
+        <h1>To-Do List</h1>
+        <div id ="form">
+            <form>
+                <div>
+                    <label for="task">Task:</label>
+                    <input type="text" id="task"/>
+                </div>
+                <div>
+                    <label for="status">Status: true or false?</label>
+                    <input type="checkbox" id="status">
+                </div>
+                <input type="submit" value="ADD" id="button"/>
+            </form>
+        </div>
+        <div id = "container"></div>
+    </section>
+    <script>
+        document.getElementById('button').addEventListener('click', addTask);
+        function addTask(event){
+            event.preventDefault();
+            let title = document.getElementById('task').value;
+            let status = document.getElementById('status').checked;
+
+            let data = {
+                title,
+                status
+            }
+
+            fetch("https://json-server-mocker-masai.herokuapp.com/tasks", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: { "Content-type": "application/json; charset=UTF-8" },
+                })
+                .then((response) => response.json())
+                .then((json) => {
+                    console.log(json)
+                    location.reload();
+                })
+                .catch((err) => console.log(err));
+
+        }
+
+        fetch("https://json-server-mocker-masai.herokuapp.com/tasks", {
+            method: "GET",
+            headers: { "Content-type": "application/json;charset=UTF-8" },
+            })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json)
+                displayTask(json)
+            })
+            .catch((err) => console.log(err));
+
+
+        let container = document.getElementById('container');
+
+        function displayTask(data){
+            data.forEach(el => {
+                if(el.title!==""){
+                    var div = document.createElement('div');
+                    var text = document.createElement('h4')
+                    text.innerText=el.title;
+                    if(el.status){
+                        text.style.color="green";
+                    }
+                    else{
+                        text.style.color="red";
+                    }
+                    div.append(text);
+                    container.append(div);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
